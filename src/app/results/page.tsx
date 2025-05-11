@@ -196,7 +196,7 @@ function Results() {
   }
   
   return (
-    <main className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--neutral, #a3a19e)' }}>
+    <main className="min-h-screen flex flex-col" style={{ backgroundColor: '#ffffff' }}>
       {/* ヘッダー部分 */}
       <div className="text-center py-8 px-4 md:px-12">
         <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
