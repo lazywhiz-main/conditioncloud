@@ -196,7 +196,7 @@ function Results() {
   }
   
   return (
-    <main className="min-h-screen flex flex-col" style={{ backgroundColor: '#ffffff' }}>
+    <main className="min-h-screen flex flex-col" style={{ backgroundColor: '#faf8f5' }}>
       {/* ヘッダー部分 */}
       <div className="text-center py-8 px-4 md:px-12">
         <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
@@ -212,25 +212,41 @@ function Results() {
         {/* 判例部分 */}
         <aside className="w-full md:w-72 flex-shrink-0 mb-4 md:mb-0">
           <div className="md:sticky md:top-8 bg-white rounded-lg shadow-sm p-4 md:p-6 border border-[var(--sub-color)]" style={{ backgroundColor: '#ffffff' }}>
-            <h2 className="text-xl font-bold mb-6 text-[var(--text-primary)] border-b border-[var(--sub-color)] pb-3">休息の要素</h2>
-            <ul className="space-y-4">
-              {categories.map(cat => {
-                const catScore = clouds.find(c => c.id === cat.id)?.score || 0;
-                const vividColor = clouds.find(c => c.id === cat.id)?.color || cat.color;
-                return (
-                  <li key={cat.id} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <span 
-                        className="inline-block w-5 h-5 rounded-full" 
-                        style={{background: vividColor, boxShadow: '0 1px 3px rgba(0,0,0,0.1)'}}
-                      />
-                      <span className="text-[var(--text-primary)] text-sm">{cat.name}</span>
-                    </div>
-                    <span className="font-bold text-[var(--main-color)]">{Math.round(catScore)}%</span>
-                  </li>
-                );
-              })}
-            </ul>
+            <div className="text-sm font-medium mb-6 text-[var(--text-secondary)] border-b border-[var(--sub-color)] pb-3">recovery type</div>
+            <div className="flex flex-row items-start gap-4">
+              {/* 縦矢印＋ラベル */}
+              <div className="flex flex-col items-center justify-between select-none" style={{minWidth: '32px', height: '100%'}}>
+                <span className="text-xs text-[var(--text-secondary)] mb-1" style={{ writingMode: 'vertical-rl', textOrientation: 'mixed', fontWeight: 500 }}>heart</span>
+                <svg width="18" height="220" viewBox="0 0 18 220" fill="none" xmlns="http://www.w3.org/2000/svg" style={{flex: 1, minHeight: '140px', maxHeight: '100%'}}>
+                  {/* 上矢印ヘッド */}
+                  <polygon points="9,8 3,20 15,20" fill="#aaa" />
+                  {/* 縦線 */}
+                  <line x1="9" y1="20" x2="9" y2="200" stroke="#aaa" strokeWidth="2" />
+                  {/* 下矢印ヘッド */}
+                  <polygon points="9,212 3,200 15,200" fill="#aaa" />
+                </svg>
+                <span className="text-xs text-[var(--text-secondary)] mt-1" style={{ writingMode: 'vertical-rl', textOrientation: 'mixed', fontWeight: 500 }}>body</span>
+              </div>
+              {/* 判例リスト */}
+              <ul className="space-y-4 flex-1">
+                {categories.map(cat => {
+                  const catScore = clouds.find(c => c.id === cat.id)?.score || 0;
+                  const vividColor = clouds.find(c => c.id === cat.id)?.color || cat.color;
+                  return (
+                    <li key={cat.id} className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <span 
+                          className="inline-block w-5 h-5 rounded-full" 
+                          style={{background: vividColor, boxShadow: '0 1px 3px rgba(0,0,0,0.1)'}}
+                        />
+                        <span className="text-[var(--text-primary)] text-sm">{cat.name}</span>
+                      </div>
+                      <span className="font-bold text-[var(--main-color)]">{Math.round(catScore)}%</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
             <div className="mt-8 text-center">
               <button
                 onClick={() => router.push('/')}
