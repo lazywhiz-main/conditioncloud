@@ -208,10 +208,10 @@ function Results() {
       </div>
 
       {/* メインコンテンツ */}
-      <div className="flex-1 flex flex-row px-4 md:px-12 gap-8 items-center justify-center">
+      <div className="flex-1 flex flex-col md:flex-row px-2 md:px-12 gap-4 md:gap-8 items-stretch md:items-center justify-center w-full">
         {/* 判例部分 */}
-        <aside className="w-72 flex-shrink-0">
-          <div className="sticky top-8 bg-white rounded-lg shadow-sm p-6 border border-[var(--sub-color)]" style={{ backgroundColor: '#ffffff' }}>
+        <aside className="w-full md:w-72 flex-shrink-0 mb-4 md:mb-0">
+          <div className="md:sticky md:top-8 bg-white rounded-lg shadow-sm p-4 md:p-6 border border-[var(--sub-color)]" style={{ backgroundColor: '#ffffff' }}>
             <h2 className="text-xl font-bold mb-6 text-[var(--text-primary)] border-b border-[var(--sub-color)] pb-3">休息の要素</h2>
             <ul className="space-y-4">
               {categories.map(cat => {
@@ -242,12 +242,12 @@ function Results() {
           </div>
         </aside>
         {/* キャンバス部分 */}
-        <div className="flex-1 flex items-center justify-center">
-          <div className="relative w-full max-w-2xl aspect-[4/3] bg-white rounded-lg shadow-md overflow-hidden border border-[var(--sub-color)] flex items-center justify-center" style={{ backgroundColor: '#ffffff', minHeight: 320, minWidth: 320 }}>
+        <div className="flex-1 flex items-center justify-center w-full">
+          <div className="relative w-full max-w-2xl aspect-[4/3] bg-white rounded-lg shadow-md overflow-hidden border border-[var(--sub-color)] flex items-center justify-center min-h-[200px] md:min-h-[320px] min-w-0">
             <canvas 
               ref={canvasRef} 
               className="w-full h-full block"
-              style={{ touchAction: 'none', backgroundColor: '#ffffff', minHeight: 320, minWidth: 320 }}
+              style={{ touchAction: 'none', backgroundColor: '#ffffff', minHeight: 200, minWidth: 0 }}
               width={600}
               height={450}
             />
