@@ -1,0 +1,402 @@
+'use client';
+
+import { useEffect, useState, useRef } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { categories } from '@/data/questions';
+
+interface Cloud {
+  category: string;
+  score: number;
+  color: string;
+  position: { x: number; y: number };
+  size: number;
+  id: string;
+}
+
+export default function Results() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [clouds, setClouds] = useState<Cloud[]>([]);
+  const [showDetails, setShowDetails] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const scores = JSON.parse(decodeURIComponent(searchParams.get('scores') || '{}'));
+    
+    // vividColor変換関数
+    function getVividColor(color: string) {
+      switch(color) {
+        case '#E6D3B3': return '#ff5252'; // 休息（脳）
+        case '#B3D6C6': return '#ff4081'; // 運動
+        case '#F5E6B3': return '#ffd600'; // 腸活
+        case '#D3C1E6': return '#eeff41'; // 変化
+        case '#F5C1B3': return '#4db6ac'; // 娯楽・探究
+        case '#B3C7F5': return '#0091ea'; // 表現
+        case '#B3E6E2': return '#00b8d4'; // 交流
+        case '#E6B3B3': return '#8e24aa'; // 休息（身体）
+        default: return color;
+      }
+    }
+
+    // 雲の位置を調整（縦長の楕円形に）
+    const basePositions = [
+      { x: 50, y: 15 },  // 上（休息・脳）
+      { x: 35, y: 30 },  // 左上（運動）
+      { x: 65, y: 30 },  // 右上（腸活）
+      { x: 40, y: 50 },  // 中央左（変化）
+      { x: 60, y: 50 },  // 中央右（娯楽・探究）
+      { x: 35, y: 70 },  // 左下（表現）
+      { x: 65, y: 70 },  // 右下（交流）
+      { x: 50, y: 85 },  // 下（休息・身体）
+    ];
+    
+    const newClouds = categories.map((category, i) => {
+      const basePosition = basePositions[i % basePositions.length];
+      const position = {
+        x: basePosition.x + (Math.random() * 6 - 3),
+        y: basePosition.y + (Math.random() * 6 - 3),
+      };
+      const score = scores[category.id] || 0;
+      const baseSize = 80;
+      const size = baseSize + (score / 100) * 55;
+      const vividColor = getVividColor(category.color);
+      return {
+        category: category.name,
+        score,
+        color: vividColor,
+        position,
+        size,
+        id: category.id,
+      };
+    });
+    
+    console.log("生成された雲データ:", newClouds); // デバッグ用
+    setClouds(newClouds);
+  }, [searchParams]);
+
+  // キャンバスに雲を描画する関数
+  useEffect(() => {
+    if (!canvasRef.current || clouds.length === 0) {
+      console.log('canvasRef.current:', canvasRef.current);
+      console.log('clouds:', clouds);
+      return;
+    }
+    
+    console.log("描画開始: 雲の数", clouds.length); // デバッグ用
+    
+    const canvas = canvasRef.current;
+    const context = canvas.getContext('2d', { alpha: false });
+    if (!context) {
+      console.error("キャンバスコンテキストの取得に失敗"); // デバッグ用
+      return;
+    }
+    
+    // 型アサーションでctxがnullでないことを保証
+    const ctx = context as CanvasRenderingContext2D;
+    
+    // キャンバスのリサイズとクリア
+    const resizeCanvas = () => {
+      const container = canvas.parentElement;
+      if (container) {
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+        console.log(`キャンバスサイズ: ${canvas.width}x${canvas.height}`); // デバッグ用
+      }
+      
+      // キャンバスを完全な白で塗りつぶす
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // 雲を描画する関数
+      const drawClouds = () => {
+        console.log("雲の描画開始"); // デバッグ用
+        clouds.forEach((cloud, index) => {
+          const x = (cloud.position.x / 100) * canvas.width;
+          const y = (cloud.position.y / 100) * canvas.height;
+          console.log(`雲[${index}] - カテゴリ: ${cloud.category}, 位置: (${x}, ${y}), サイズ: ${cloud.size}, 色: ${cloud.color}`); // デバッグ用
+          drawCloud(ctx, x, y, cloud.size, cloud.color);
+        });
+      };
+      drawClouds();
+    };
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    return () => window.removeEventListener('resize', resizeCanvas);
+  }, [clouds]);
+
+  // 16進数のカラーコードをRGB形式に変換する関数（堅牢版）
+  function hexToRgb(hex: string) {
+    hex = hex.replace(/^#/, '').toLowerCase();
+    if (hex.length === 3) {
+      hex = hex.split('').map(x => x + x).join('');
+    }
+    if (hex.length !== 6) return null;
+    const num = parseInt(hex, 16);
+    return {
+      r: (num >> 16) & 255,
+      g: (num >> 8) & 255,
+      b: num & 255
+    };
+  }
+
+  function rgbToHex(r: number, g: number, b: number) {
+    return (
+      '#' +
+      [r, g, b]
+        .map(x => {
+          const hex = x.toString(16);
+          return hex.length === 1 ? '0' + hex : hex;
+        })
+        .join('')
+    );
+  }
+
+  // 雲を描画する関数
+  function drawCloud(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, color: string) {
+    ctx.save();
+
+    // 1. さらに外側のぼかしを増やす
+    ctx.globalAlpha = 0.10;
+    ctx.filter = 'blur(16px)';
+    for (let i = 0; i < 10; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = size * 0.32 + Math.random() * size * 0.28;
+      const cx = x + Math.cos(angle) * dist;
+      const cy = y + Math.sin(angle) * dist;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, size * (0.48 + Math.random() * 0.22), size * (0.41 + Math.random() * 0.18), Math.random() * Math.PI * 2, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+    ctx.filter = 'none';
+
+    // 2. メインの雲（中心部もややぼかす）
+    for (let i = 0; i < 12; i++) {
+      const angle = (Math.PI * 2 * i) / 12 + Math.random() * 0.3;
+      const dist = size * 0.15 + Math.random() * size * 0.13;
+      const cx = x + Math.cos(angle) * dist;
+      const cy = y + Math.sin(angle) * dist;
+      ctx.globalAlpha = 0.28 + Math.random() * 0.22;
+      ctx.filter = 'blur(3px)';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, size * (0.33 + Math.random() * 0.18), size * (0.29 + Math.random() * 0.15), Math.random() * Math.PI * 2, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.filter = 'none';
+    }
+
+    // 3. 粒子（小さな円）を周囲に散らす
+    ctx.globalAlpha = 0.09;
+    for (let i = 0; i < 28; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = size * 0.45 + Math.random() * size * 0.35;
+      const cx = x + Math.cos(angle) * dist;
+      const cy = y + Math.sin(angle) * dist;
+      ctx.beginPath();
+      ctx.arc(cx, cy, size * (0.08 + Math.random() * 0.09), 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+
+    // 4. 中心部もややぼかしつつ濃く
+    ctx.globalAlpha = 0.5;
+    ctx.filter = 'blur(2px)';
+    ctx.beginPath();
+    ctx.arc(x, y, size * 0.23, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.filter = 'none';
+
+    // 5. ハイライト（白い粒子）
+    ctx.globalAlpha = 0.09;
+    for (let i = 0; i < 8; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = size * 0.22 + Math.random() * size * 0.18;
+      const cx = x + Math.cos(angle) * dist;
+      const cy = y + Math.sin(angle) * dist;
+      ctx.beginPath();
+      ctx.arc(cx, cy, size * (0.07 + Math.random() * 0.06), 0, Math.PI * 2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+  
+  // 水彩画風の雲を描画する関数
+  function drawWatercolorCloud(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, color: string) {
+    // 基本カラーと透明カラーを準備
+    const baseColor = color;
+    const transparentColor = 'rgba(255, 255, 255, 0)';
+    
+    // 1. まず非常に薄い背景の円を描画（外側のぼかし効果）
+    ctx.globalAlpha = 0.2;
+    ctx.beginPath();
+    ctx.arc(x, y, size * 0.8, 0, Math.PI * 2);
+    
+    // 外側へのグラデーション
+    const outerGradient = ctx.createRadialGradient(x, y, size * 0.3, x, y, size * 0.8);
+    outerGradient.addColorStop(0, color + '40'); // 非常に薄い色
+    outerGradient.addColorStop(1, transparentColor);
+    ctx.fillStyle = outerGradient;
+    ctx.fill();
+    
+    // 2. 粒子を使った雲の中心部（やや濃い部分）
+    drawCloudParticles(ctx, x, y, size, color, 0.4, 0.7, 40); // 中心部の粒子（少し濃いめ）
+    
+    // 3. 濃い粒子を使った雲の核心部
+    drawCloudParticles(ctx, x, y, size * 0.6, color, 0.6, 0.9, 25); // 核心部の粒子（濃いめ）
+    
+    // 4. 周囲にさらに薄い粒子をランダムに追加（外側）
+    drawCloudParticles(ctx, x, y, size * 1.2, color, 0.1, 0.4, 20, true); // 外側の粒子（薄め）
+    
+    // 5. ハイライト効果（雲の質感を強化）
+    ctx.globalAlpha = 0.3;
+    for (let i = 0; i < 5; i++) {
+      const hx = x + (Math.random() - 0.5) * size * 0.5;
+      const hy = y + (Math.random() - 0.5) * size * 0.5;
+      const hr = size * (0.1 + Math.random() * 0.15);
+      
+      ctx.beginPath();
+      ctx.arc(hx, hy, hr, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+    }
+  }
+  
+  // 雲の粒子を描画する関数
+  function drawCloudParticles(
+    ctx: CanvasRenderingContext2D, 
+    x: number, 
+    y: number, 
+    size: number, 
+    color: string, 
+    minAlpha: number, 
+    maxAlpha: number, 
+    particleCount: number, 
+    scatter: boolean = false
+  ) {
+    // 粒子のサイズ範囲
+    const minParticleSize = size * 0.05;
+    const maxParticleSize = size * 0.2;
+    
+    // 粒子の分布範囲
+    const distributionRadius = scatter ? size * 0.9 : size * 0.5;
+    
+    for (let i = 0; i < particleCount; i++) {
+      // ランダムな角度と距離で粒子を配置
+      let distance, angle;
+      
+      if (scatter) {
+        // 外側に広がる粒子（一様分布）
+        distance = Math.random() * distributionRadius;
+        angle = Math.random() * Math.PI * 2;
+      } else {
+        // 中心付近に集まる粒子（ガウス分布に近い効果）
+        distance = Math.pow(Math.random(), 1.5) * distributionRadius;
+        angle = Math.random() * Math.PI * 2;
+      }
+      
+      const px = x + Math.cos(angle) * distance;
+      const py = y + Math.sin(angle) * distance;
+      
+      // 粒子のサイズはランダム
+      const particleSize = minParticleSize + Math.random() * (maxParticleSize - minParticleSize);
+      
+      // 粒子の不透明度は中心に近いほど高く
+      const normalizedDistance = distance / distributionRadius;
+      const alpha = minAlpha + (maxAlpha - minAlpha) * (1 - Math.min(1, normalizedDistance * 1.2));
+      
+      // 粒子を描画
+      ctx.globalAlpha = alpha;
+      ctx.beginPath();
+      
+      // わずかに楕円形の粒子
+      const aspect = 0.8 + Math.random() * 0.4;
+      ctx.ellipse(
+        px, py, 
+        particleSize, 
+        particleSize * aspect, 
+        Math.random() * Math.PI * 2, 
+        0, Math.PI * 2
+      );
+      
+      // 粒子の中心ほど濃い効果
+      const gradient = ctx.createRadialGradient(px, py, 0, px, py, particleSize);
+      gradient.addColorStop(0, color);
+      gradient.addColorStop(1, color + '00'); // 完全に透明
+      
+      ctx.fillStyle = gradient;
+      ctx.fill();
+    }
+  }
+
+  return (
+    <main className="min-h-screen bg-white flex flex-col" style={{ backgroundColor: '#ffffff' }}>
+      {/* ヘッダー部分 */}
+      <div className="text-center py-8 px-4 md:px-12">
+        <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
+          あなただけの<span className="text-[var(--main-color)]">休息バランス</span>
+        </h1>
+        <p className="text-[var(--text-secondary)] max-w-xl mx-auto">
+          今のあなたの状態をもとに、8つの視点から休息バランスを雲の大きさで可視化しています。
+        </p>
+      </div>
+
+      {/* メインコンテンツ */}
+      <div className="flex-1 flex flex-row px-4 md:px-12 gap-8 items-center justify-center">
+        {/* 判例部分 */}
+        <aside className="w-72 flex-shrink-0">
+          <div className="sticky top-8 bg-white rounded-lg shadow-sm p-6 border border-[var(--sub-color)]" style={{ backgroundColor: '#ffffff' }}>
+            <h2 className="text-xl font-bold mb-6 text-[var(--text-primary)] border-b border-[var(--sub-color)] pb-3">休息の要素</h2>
+            <ul className="space-y-4">
+              {categories.map(cat => {
+                const catScore = clouds.find(c => c.id === cat.id)?.score || 0;
+                const vividColor = clouds.find(c => c.id === cat.id)?.color || cat.color;
+                return (
+                  <li key={cat.id} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <span 
+                        className="inline-block w-5 h-5 rounded-full" 
+                        style={{background: vividColor, boxShadow: '0 1px 3px rgba(0,0,0,0.1)'}}
+                      />
+                      <span className="text-[var(--text-primary)] text-sm">{cat.name}</span>
+                    </div>
+                    <span className="font-bold text-[var(--main-color)]">{Math.round(catScore)}%</span>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="mt-8 text-center">
+              <button
+                onClick={() => router.push('/')}
+                className="btn btn-primary rounded-full py-3 px-6 w-full"
+              >
+                トップに戻る
+              </button>
+            </div>
+          </div>
+        </aside>
+        {/* キャンバス部分 */}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="relative w-full max-w-2xl aspect-[4/3] bg-white rounded-lg shadow-md overflow-hidden border border-[var(--sub-color)] flex items-center justify-center" style={{ backgroundColor: '#ffffff', minHeight: 320, minWidth: 320 }}>
+            <canvas 
+              ref={canvasRef} 
+              className="w-full h-full block"
+              style={{ touchAction: 'none', backgroundColor: '#ffffff', minHeight: 320, minWidth: 320 }}
+              width={600}
+              height={450}
+            />
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+// スコアに応じたメッセージを返す関数
+function getScoreMessage(score: number, category: string): string {
+  if (score < 30) return "もう少し意識してみると良いかもしれません";
+  if (score < 60) return "バランスは取れていますが、さらに高められます";
+  return "とても良いバランスです";
+}
