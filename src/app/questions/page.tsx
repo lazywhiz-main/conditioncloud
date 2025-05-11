@@ -85,7 +85,7 @@ export default function Questions() {
         
         <div className="bg-white/95 p-5 md:p-6 rounded-lg shadow-md border border-[var(--sub-color)] relative">
           {/* 設問タイトルと説明の視覚的階層を明確化 */}
-          <h2 className="text-xl font-bold mb-2 text-[var(--text-primary)] leading-relaxed">{q.text}</h2>
+          <h2 className="text-base md:text-lg font-bold mb-2 text-[var(--text-primary)] leading-normal md:leading-relaxed">{q.text}</h2>
           <p className="text-[var(--text-secondary)] text-sm mb-4 font-normal">あてはまるものをすべて選択してください（複数選択可）</p>
           
           {/* 選択済みアイテム数のカウンター */}
@@ -103,7 +103,7 @@ export default function Questions() {
                 className="relative"
               >
                 <label 
-                  className={`flex items-start space-x-3 p-2 rounded-lg cursor-pointer transition-all duration-200 w-full
+                  className={`flex items-start space-x-3 p-3 md:p-4 rounded-lg cursor-pointer transition-all duration-200 w-full
                     ${(answers[q.id] || []).includes(option) 
                       ? 'bg-[var(--sub-color-light)] border border-[var(--sub-color)]' 
                       : 'hover:bg-[var(--neutral-lighter)] border border-transparent'}`}
@@ -127,7 +127,7 @@ export default function Questions() {
                       </svg>
                     )}
                   </div>
-                  <span className="text-[var(--text-primary)] text-sm leading-tight">{option}</span>
+                  <span className="text-[var(--text-primary)] text-sm leading-relaxed">{option}</span>
                 </label>
               </div>
             ))}
