@@ -1,8 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* メインカラー（ティール） */
+  --main-color: #4a8d8b;
+  --main-color-light: #6ba7a5;
+  --main-color-dark: #356563;
+  
+  /* サブカラー（サンド） */
+  --sub-color: #d6cfc7;
+  --sub-color-light: #e5e0da;
+  --sub-color-dark: #b8b0a5;
+  
+  /* アクセントカラー（ラベンダー） */
+  --accent-color: #9d8da5;
+  --accent-color-light: #b4a7bc;
+  --accent-color-dark: #7a6b82;
+  
+  /* ニュートラルカラー */
+  --neutral-lightest: #faf8f5;
+  --neutral-lighter: #f2f0ec;
+  --neutral-light: #e4e2df;
+  --neutral: #a3a19e;
+  --neutral-dark: #5f5d5a;
+  --neutral-darkest: #2c3e50;
+  
+  /* テキストカラー */
+  --text-primary: #2c3e50;
+  --text-secondary: #5f5d5a;
+  --text-tertiary: #a3a19e;
+  --text-on-dark: #ffffff;
+  --text-on-light: #2c3e50;
+  
+  /* 機能的カラー */
+  --success: #7bb77b;
+  --warning: #e6c27a;
+  --error: #d16d6d;
+  --info: #6ca4cc;
 }
 
 @theme inline {
@@ -20,7 +53,93 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Noto Serif JP', serif;
+  color: var(--text-primary);
+  line-height: 1.6;
+  background-color: var(--neutral-lightest);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 300;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: var(--main-color);
+}
+
+h2 {
+  font-size: 2rem;
+  color: var(--text-primary);
+}
+
+h3 {
+  font-size: 1.5rem;
+  color: var(--main-color);
+}
+
+/* ボタンのクラス */
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: var(--main-color);
+  color: var(--text-on-dark);
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: var(--main-color-light);
+}
+
+.btn-primary:active {
+  background-color: var(--main-color-dark);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--main-color);
+  border: 1px solid var(--main-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--main-color-light);
+  color: var(--text-on-dark);
+}
+
+/* アニメーション */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-in;
 }
