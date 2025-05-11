@@ -17,8 +17,6 @@ export default function Results() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [clouds, setClouds] = useState<Cloud[]>([]);
-  const [showDetails, setShowDetails] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const scores = JSON.parse(decodeURIComponent(searchParams.get('scores') || '{}'));
@@ -123,33 +121,6 @@ export default function Results() {
     resizeCanvas();
     return () => window.removeEventListener('resize', resizeCanvas);
   }, [clouds]);
-
-  // 16進数のカラーコードをRGB形式に変換する関数（堅牢版）
-  function hexToRgb(hex: string) {
-    hex = hex.replace(/^#/, '').toLowerCase();
-    if (hex.length === 3) {
-      hex = hex.split('').map(x => x + x).join('');
-    }
-    if (hex.length !== 6) return null;
-    const num = parseInt(hex, 16);
-    return {
-      r: (num >> 16) & 255,
-      g: (num >> 8) & 255,
-      b: num & 255
-    };
-  }
-
-  function rgbToHex(r: number, g: number, b: number) {
-    return (
-      '#' +
-      [r, g, b]
-        .map(x => {
-          const hex = x.toString(16);
-          return hex.length === 1 ? '0' + hex : hex;
-        })
-        .join('')
-    );
-  }
 
   // 雲を描画する関数
   function drawCloud(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, color: string) {
@@ -392,11 +363,4 @@ export default function Results() {
       </div>
     </main>
   );
-}
-
-// スコアに応じたメッセージを返す関数
-function getScoreMessage(score: number, category: string): string {
-  if (score < 30) return "もう少し意識してみると良いかもしれません";
-  if (score < 60) return "バランスは取れていますが、さらに高められます";
-  return "とても良いバランスです";
 }
