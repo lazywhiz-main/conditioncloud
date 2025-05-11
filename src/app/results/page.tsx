@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { categories } from '../../data/questions';
 
@@ -13,7 +13,7 @@ interface Cloud {
   id: string;
 }
 
-export default function Results() {
+function Results() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [clouds, setClouds] = useState<Cloud[]>([]);
@@ -195,21 +195,6 @@ export default function Results() {
     ctx.restore();
   }
   
-  // 雲の粒子を描画する関数
-  // function drawCloudParticles(
-  //   ctx: CanvasRenderingContext2D, 
-  //   x: number, 
-  //   y: number, 
-  //   size: number, 
-  //   color: string, 
-  //   minAlpha: number, 
-  //   maxAlpha: number, 
-  //   particleCount: number, 
-  //   scatter: boolean = false
-  // ) {
-  //   // ...（関数本体省略）...
-  // }
-
   return (
     <main className="min-h-screen bg-white flex flex-col" style={{ backgroundColor: '#ffffff' }}>
       {/* ヘッダー部分 */}
@@ -270,5 +255,13 @@ export default function Results() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function ResultsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Results />
+    </Suspense>
   );
 }
