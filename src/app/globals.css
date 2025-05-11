@@ -143,3 +143,7 @@ h3 {
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-in;
 }
+
+html, body {
+  background-color: #ffffff !important;
+}
