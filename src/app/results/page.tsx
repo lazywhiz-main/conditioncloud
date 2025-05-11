@@ -196,71 +196,19 @@ export default function Results() {
   }
   
   // 雲の粒子を描画する関数
-  function drawCloudParticles(
-    ctx: CanvasRenderingContext2D, 
-    x: number, 
-    y: number, 
-    size: number, 
-    color: string, 
-    minAlpha: number, 
-    maxAlpha: number, 
-    particleCount: number, 
-    scatter: boolean = false
-  ) {
-    // 粒子のサイズ範囲
-    const minParticleSize = size * 0.05;
-    const maxParticleSize = size * 0.2;
-    
-    // 粒子の分布範囲
-    const distributionRadius = scatter ? size * 0.9 : size * 0.5;
-    
-    for (let i = 0; i < particleCount; i++) {
-      // ランダムな角度と距離で粒子を配置
-      let distance, angle;
-      
-      if (scatter) {
-        // 外側に広がる粒子（一様分布）
-        distance = Math.random() * distributionRadius;
-        angle = Math.random() * Math.PI * 2;
-      } else {
-        // 中心付近に集まる粒子（ガウス分布に近い効果）
-        distance = Math.pow(Math.random(), 1.5) * distributionRadius;
-        angle = Math.random() * Math.PI * 2;
-      }
-      
-      const px = x + Math.cos(angle) * distance;
-      const py = y + Math.sin(angle) * distance;
-      
-      // 粒子のサイズはランダム
-      const particleSize = minParticleSize + Math.random() * (maxParticleSize - minParticleSize);
-      
-      // 粒子の不透明度は中心に近いほど高く
-      const normalizedDistance = distance / distributionRadius;
-      const alpha = minAlpha + (maxAlpha - minAlpha) * (1 - Math.min(1, normalizedDistance * 1.2));
-      
-      // 粒子を描画
-      ctx.globalAlpha = alpha;
-      ctx.beginPath();
-      
-      // わずかに楕円形の粒子
-      const aspect = 0.8 + Math.random() * 0.4;
-      ctx.ellipse(
-        px, py, 
-        particleSize, 
-        particleSize * aspect, 
-        Math.random() * Math.PI * 2, 
-        0, Math.PI * 2
-      );
-      
-      // 粒子の中心ほど濃い効果
-      const gradient = ctx.createRadialGradient(px, py, 0, px, py, particleSize);
-      gradient.addColorStop(0, color);
-      gradient.addColorStop(1, color + '00'); // 完全に透明
-      
-      ctx.fillStyle = gradient;
-      ctx.fill();
-    }
-  }
+  // function drawCloudParticles(
+  //   ctx: CanvasRenderingContext2D, 
+  //   x: number, 
+  //   y: number, 
+  //   size: number, 
+  //   color: string, 
+  //   minAlpha: number, 
+  //   maxAlpha: number, 
+  //   particleCount: number, 
+  //   scatter: boolean = false
+  // ) {
+  //   // ...（関数本体省略）...
+  // }
 
   return (
     <main className="min-h-screen bg-white flex flex-col" style={{ backgroundColor: '#ffffff' }}>
