@@ -103,12 +103,12 @@ export default function Questions() {
                 className="relative"
               >
                 <label 
-                  className={`flex items-start space-x-3 p-3 md:p-4 rounded-lg cursor-pointer transition-all duration-200 w-full
+                  className={`flex items-center space-x-3 p-3 md:p-4 rounded-lg cursor-pointer transition-all duration-200 w-full
                     ${(answers[q.id] || []).includes(option) 
                       ? 'bg-[var(--sub-color-light)] border border-[var(--sub-color)]' 
                       : 'hover:bg-[var(--neutral-lighter)] border border-transparent'}`}
                 >
-                  <div className="relative flex items-center justify-center mt-0.5 flex-shrink-0">
+                  <div className="relative flex items-center justify-center flex-shrink-0">
                     <input
                       type="checkbox"
                       checked={(answers[q.id] || []).includes(option)}
