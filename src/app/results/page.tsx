@@ -243,11 +243,11 @@ function Results() {
         </aside>
         {/* キャンバス部分 */}
         <div className="flex-1 flex items-center justify-center w-full">
-          <div className="relative w-full max-w-2xl aspect-[4/3] bg-white rounded-lg shadow-md overflow-hidden border border-[var(--sub-color)] flex items-center justify-center min-h-[200px] md:min-h-[320px] min-w-0">
+          <div className="relative w-full max-w-2xl aspect-auto md:aspect-[4/3] bg-white rounded-lg shadow-md overflow-hidden border border-[var(--sub-color)] flex items-center justify-center min-h-[320px] md:min-h-[320px] min-w-0">
             <canvas 
               ref={canvasRef} 
               className="w-full h-full block"
-              style={{ touchAction: 'none', backgroundColor: '#ffffff', minHeight: 200, minWidth: 0 }}
+              style={{ touchAction: 'none', backgroundColor: '#ffffff', minHeight: 320, minWidth: 0 }}
               width={600}
               height={450}
             />
