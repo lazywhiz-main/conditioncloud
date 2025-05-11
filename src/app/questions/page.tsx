@@ -85,7 +85,7 @@ export default function Questions() {
         
         <div className="bg-white/95 p-5 md:p-6 rounded-lg shadow-md border border-[var(--sub-color)] relative">
           {/* 設問タイトルと説明の視覚的階層を明確化 */}
-          <p className="text-sm md:text-base font-bold mb-2 text-[var(--text-primary)] leading-normal md:leading-relaxed">{q.text}</p>
+          <h3 className="text-lg font-bold mb-2 text-[var(--text-primary)] leading-normal md:leading-relaxed">{q.text}</h3>
           <p className="text-[var(--text-secondary)] text-sm mb-4 font-normal">あてはまるものをすべて選択してください（複数選択可）</p>
           
           {/* 選択済みアイテム数のカウンター */}
