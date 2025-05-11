@@ -200,10 +200,10 @@ function Results() {
       {/* ヘッダー部分 */}
       <div className="text-center py-8 px-4 md:px-12">
         <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2">
-          あなただけの<span className="text-[var(--main-color)]">休息バランス</span>
+          <b>あなたのリカバリーバランス</b>
         </h1>
         <p className="text-[var(--text-secondary)] max-w-xl mx-auto">
-          今のあなたの状態をもとに、8つの視点から休息バランスを雲の大きさで可視化しています。
+          今のあなたの状態をもとに、8つの視点から休息バランスを可視化しています。
         </p>
       </div>
 
