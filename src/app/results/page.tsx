@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { categories } from '../../data/questions';
+import { categories } from '../../../data/questions';
 
 interface Cloud {
   category: string;
