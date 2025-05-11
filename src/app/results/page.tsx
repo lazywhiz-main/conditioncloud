@@ -17,6 +17,7 @@ export default function Results() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [clouds, setClouds] = useState<Cloud[]>([]);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const scores = JSON.parse(decodeURIComponent(searchParams.get('scores') || '{}'));
@@ -192,47 +193,6 @@ export default function Results() {
     }
 
     ctx.restore();
-  }
-  
-  // 水彩画風の雲を描画する関数
-  function drawWatercolorCloud(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, color: string) {
-    // 基本カラーと透明カラーを準備
-    const baseColor = color;
-    const transparentColor = 'rgba(255, 255, 255, 0)';
-    
-    // 1. まず非常に薄い背景の円を描画（外側のぼかし効果）
-    ctx.globalAlpha = 0.2;
-    ctx.beginPath();
-    ctx.arc(x, y, size * 0.8, 0, Math.PI * 2);
-    
-    // 外側へのグラデーション
-    const outerGradient = ctx.createRadialGradient(x, y, size * 0.3, x, y, size * 0.8);
-    outerGradient.addColorStop(0, color + '40'); // 非常に薄い色
-    outerGradient.addColorStop(1, transparentColor);
-    ctx.fillStyle = outerGradient;
-    ctx.fill();
-    
-    // 2. 粒子を使った雲の中心部（やや濃い部分）
-    drawCloudParticles(ctx, x, y, size, color, 0.4, 0.7, 40); // 中心部の粒子（少し濃いめ）
-    
-    // 3. 濃い粒子を使った雲の核心部
-    drawCloudParticles(ctx, x, y, size * 0.6, color, 0.6, 0.9, 25); // 核心部の粒子（濃いめ）
-    
-    // 4. 周囲にさらに薄い粒子をランダムに追加（外側）
-    drawCloudParticles(ctx, x, y, size * 1.2, color, 0.1, 0.4, 20, true); // 外側の粒子（薄め）
-    
-    // 5. ハイライト効果（雲の質感を強化）
-    ctx.globalAlpha = 0.3;
-    for (let i = 0; i < 5; i++) {
-      const hx = x + (Math.random() - 0.5) * size * 0.5;
-      const hy = y + (Math.random() - 0.5) * size * 0.5;
-      const hr = size * (0.1 + Math.random() * 0.15);
-      
-      ctx.beginPath();
-      ctx.arc(hx, hy, hr, 0, Math.PI * 2);
-      ctx.fillStyle = '#ffffff';
-      ctx.fill();
-    }
   }
   
   // 雲の粒子を描画する関数
